@@ -1,13 +1,13 @@
-const app = require("express")();
+const express = require("express");
+const path = require('path');
+const app = express();
 const axios = require("axios");
 const { apiKey, apiUser } = require("./apiObject");
 
 var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json())
-
-const port = process.env.PORT || 5000;
-app.listen(port, () => console.log(`Listening on port ${port}`));
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, '/client/build')));
 
 app.get("/employee", (req, res) => {
     axios.get(`https://leviathan.challenge.growflow.com/employee?ApiUser=${apiUser}&ApiKey=${apiKey}`)
@@ -19,3 +19,10 @@ app.post("/employee", (req, res) => {
     .then(() => {res.status(200).send(req.body)})
     .catch(err => res.send(err));
 });
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname+'/client/build/index.html'));
+});
+
+const port = process.env.PORT || 5000;
+app.listen(port, () => console.log(`Listening on port ${port}`));
